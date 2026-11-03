@@ -1,0 +1,10 @@
+<%@ page pageEncoding="UTF-8" %>
+</main>
+<footer class="rodape">
+    <div class="rodape-barra vidro">
+        <span>Projeto acadêmico</span>
+        <span>Java · JSP + Servlet · MySQL</span>
+    </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<%@ page pageEncoding="UTF-8" %>
+<%-- Cabecalho comum. A pagina que inclui este arquivo precisa declarar a taglib "c"
+     e (opcionalmente) definir ${tituloPagina} antes do include. --%>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><c:out value="${tituloPagina}"/> | Catálogo de Livros</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo-escuro.css?v=5">
+</head>
+<body>
+<header class="topo">
+    <div class="topo-barra vidro">
+        <a class="marca" href="${pageContext.request.contextPath}/livros">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v15H5.5C4.7 19 4 18.3 4 17.5v-12Z"/><path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H13v15h5.5c.8 0 1.5-.7 1.5-1.5v-12Z"/></svg>
+            <span>Catálogo</span>
+        </a>
+        <nav>
+            <a href="${pageContext.request.contextPath}/livros">Livros</a>
+            <a class="botao" href="${pageContext.request.contextPath}/livros/novo">+ Novo livro</a>
+        </nav>
+    </div>
+</header>
+<main class="container">

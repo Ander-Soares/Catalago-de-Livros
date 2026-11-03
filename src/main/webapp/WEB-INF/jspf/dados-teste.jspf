@@ -1,0 +1,70 @@
+<%@ page pageEncoding="UTF-8" %>
+<%@ page import="java.util.*" %>
+<%--
+  DADOS DE TESTE (temporario).
+  Simula o que o backend vai entregar para as paginas:
+    - "livros": lista de livros (ja filtrada pela busca e pelo genero)
+    - "livro":  um livro especifico (quando a URL tem ?id=...)
+    - "generos": lista de generos para os selects
+  Quando o banco estiver ligado, este arquivo sera REMOVIDO e os Servlets
+  passarao a colocar esses mesmos atributos na requisicao.
+--%>
+<%!
+    private Map<String, Object> livroFake(int id, String titulo, String autor, int ano,
+                                          String genero, String detalhes) {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("id", id);
+        m.put("titulo", titulo);
+        m.put("autor", autor);
+        m.put("ano", ano);
+        m.put("genero", genero);
+        m.put("detalhes", detalhes);
+        m.put("capaUrl", "");
+        return m;
+    }
+%>
+<%
+    List<Map<String, Object>> todos = new ArrayList<>();
+    todos.add(livroFake(1, "Dom Casmurro", "Machado de Assis", 1899, "Romance",
+            "Bentinho narra a propria vida e tenta resolver a duvida que o consome: Capitu o traiu ou nao?"));
+    todos.add(livroFake(2, "O Hobbit", "J. R. R. Tolkien", 1937, "Fantasia",
+            "Bilbo Bolseiro, um hobbit pacato, e arrastado para uma viagem com treze anoes para recuperar um tesouro guardado por um dragao."));
+    todos.add(livroFake(3, "1984", "George Orwell", 1949, "Ficção",
+            "Em um Estado totalitario que vigia tudo, Winston tenta guardar um pouco de liberdade e verdade."));
+    todos.add(livroFake(4, "Capitães da Areia", "Jorge Amado", 1937, "Drama",
+            "Um grupo de meninos de rua vive de pequenos furtos pelas ruas de Salvador e cria seus proprios laços de lealdade."));
+    todos.add(livroFake(5, "Código Limpo", "Robert C. Martin", 2008, "Técnico",
+            "Praticas para escrever codigo legivel, simples e facil de manter."));
+
+    // Simula a busca (titulo ou autor) e o filtro por genero
+    String busca = request.getParameter("busca");
+    String generoFiltro = request.getParameter("genero");
+    List<Map<String, Object>> livros = new ArrayList<>();
+    for (Map<String, Object> item : todos) {
+        boolean ok = true;
+        if (busca != null && !busca.isBlank()) {
+            String b = busca.toLowerCase();
+            ok = item.get("titulo").toString().toLowerCase().contains(b)
+              || item.get("autor").toString().toLowerCase().contains(b);
+        }
+        if (ok && generoFiltro != null && !generoFiltro.isBlank()) {
+            ok = generoFiltro.equals(item.get("genero"));
+        }
+        if (ok) livros.add(item);
+    }
+    request.setAttribute("livros", livros);
+
+    // Simula "buscar por id" (detalhes e edicao)
+    String idParam = request.getParameter("id");
+    if (idParam != null) {
+        for (Map<String, Object> item : todos) {
+            if (String.valueOf(item.get("id")).equals(idParam)) {
+                request.setAttribute("livro", item);
+            }
+        }
+    }
+
+    request.setAttribute("generos", Arrays.asList(
+            "Romance", "Ficção", "Fantasia", "Aventura", "Drama",
+            "Terror", "Biografia", "Técnico", "Outro"));
+%>
