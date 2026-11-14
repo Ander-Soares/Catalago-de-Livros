@@ -2,6 +2,14 @@
 
 Aplicação web para cadastrar, consultar, editar, excluir e buscar livros, desenvolvida em **Java (JSP + Servlet)** com banco de dados **MySQL**. Projeto acadêmico.
 
+## Demonstração
+
+<img width="1111" height="1300" alt="Screenshot 2026-10-31 004740" src="https://github.com/user-attachments/assets/2eb92767-42f7-4d67-bbc1-f803492e358d" />
+<img width="1690" height="1302" alt="Screenshot 2026-11-14 193151" src="https://github.com/user-attachments/assets/bedb3773-0555-4eb2-af9f-6beb0ae41bcf" />
+<img width="1676" height="1298" alt="Screenshot 2026-11-14 193303" src="https://github.com/user-attachments/assets/c3bc33d2-7398-4659-b921-1c5286928751" />
+<img width="1688" height="1299" alt="Screenshot 2026-11-14 193320" src="https://github.com/user-attachments/assets/484858e8-3356-4cad-8d27-901efc769302" />
+
+
 ## Funcionalidades
 
 | Funcionalidade | Onde está |
