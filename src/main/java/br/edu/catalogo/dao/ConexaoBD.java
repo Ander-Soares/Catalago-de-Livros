@@ -21,13 +21,22 @@ import java.util.Properties;
  */
 public final class ConexaoBD {
 
+    /** Nome do arquivo de configuração, procurado no classpath da aplicação. */
     private static final String ARQUIVO_CONFIG = "db.properties";
+
+    /** Configurações lidas uma única vez, quando a classe é carregada. */
     private static final Properties CONFIG = carregarConfiguracao();
 
     /** Classe utilitária: não deve ser instanciada. */
     private ConexaoBD() {
     }
 
+    /**
+     * Lê o arquivo {@code db.properties} e garante que o driver do MySQL está carregado.
+     *
+     * @return as propriedades de conexão (db.url, db.usuario, db.senha e db.driver)
+     * @throws IllegalStateException se o arquivo não existir, não puder ser lido ou se o driver não for encontrado
+     */
     private static Properties carregarConfiguracao() {
         Properties props = new Properties();
         try (InputStream entrada = ConexaoBD.class.getClassLoader().getResourceAsStream(ARQUIVO_CONFIG)) {

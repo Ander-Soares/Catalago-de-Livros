@@ -26,6 +26,10 @@ public class LivroDAO {
     /** Colunas lidas em todas as consultas (evita repetir o texto). */
     private static final String COLUNAS = "id, titulo, autor, ano, genero, detalhes, capa_url";
 
+    /** Cria o DAO. Ele não guarda estado: cada método abre e fecha a sua própria conexão. */
+    public LivroDAO() {
+    }
+
     // ------------------------------------------------------------------
     // CREATE
     // ------------------------------------------------------------------
@@ -33,6 +37,9 @@ public class LivroDAO {
     /**
      * Insere um livro novo. Depois de inserir, o {@code id} gerado pelo banco
      * é colocado no próprio objeto recebido.
+     *
+     * @param livro livro a gravar (o id é preenchido ao final)
+     * @throws SQLException se o banco recusar o comando ou estiver indisponível
      */
     public void inserir(Livro livro) throws SQLException {
         String sql = "INSERT INTO livros (titulo, autor, ano, genero, detalhes, capa_url) "
@@ -56,7 +63,12 @@ public class LivroDAO {
     // READ
     // ------------------------------------------------------------------
 
-    /** Devolve todos os livros, em ordem alfabética de título. */
+    /**
+     * Devolve todos os livros, em ordem alfabética de título.
+     *
+     * @return lista com todos os livros (vazia se não houver nenhum)
+     * @throws SQLException se houver problema ao consultar o banco
+     */
     public List<Livro> listarTodos() throws SQLException {
         return buscar(null, null);
     }
@@ -64,7 +76,9 @@ public class LivroDAO {
     /**
      * Busca um livro pelo id.
      *
+     * @param id identificador do livro
      * @return o livro, ou {@code null} se não existir
+     * @throws SQLException se houver problema ao consultar o banco
      */
     public Livro buscarPorId(int id) throws SQLException {
         String sql = "SELECT " + COLUNAS + " FROM livros WHERE id = ?";
@@ -87,6 +101,8 @@ public class LivroDAO {
      *
      * @param termo  texto a procurar em título/autor (pode ser {@code null} ou vazio)
      * @param genero gênero exato (pode ser {@code null} ou vazio = todos)
+     * @return livros encontrados, em ordem alfabética de título
+     * @throws SQLException se houver problema ao consultar o banco
      */
     public List<Livro> buscar(String termo, String genero) throws SQLException {
         StringBuilder sql = new StringBuilder("SELECT " + COLUNAS + " FROM livros WHERE 1 = 1");
@@ -127,7 +143,9 @@ public class LivroDAO {
     /**
      * Atualiza todos os campos de um livro existente (identificado pelo id do objeto).
      *
+     * @param livro livro com os novos dados e o id do registro a alterar
      * @return {@code true} se algum registro foi alterado
+     * @throws SQLException se o banco recusar o comando ou estiver indisponível
      */
     public boolean atualizar(Livro livro) throws SQLException {
         String sql = "UPDATE livros SET titulo = ?, autor = ?, ano = ?, genero = ?, "
@@ -149,7 +167,9 @@ public class LivroDAO {
     /**
      * Exclui o livro com o id informado.
      *
+     * @param id identificador do livro a excluir
      * @return {@code true} se algum registro foi removido
+     * @throws SQLException se o banco recusar o comando ou estiver indisponível
      */
     public boolean excluir(int id) throws SQLException {
         String sql = "DELETE FROM livros WHERE id = ?";
@@ -166,7 +186,13 @@ public class LivroDAO {
     // Métodos auxiliares (privados: só o DAO precisa deles)
     // ------------------------------------------------------------------
 
-    /** Preenche os 6 primeiros parâmetros, iguais no INSERT e no UPDATE. */
+    /**
+     * Preenche os 6 primeiros parâmetros, iguais no INSERT e no UPDATE.
+     *
+     * @param comando comando já preparado, com os 6 primeiros {@code ?} a preencher
+     * @param livro   livro que fornece os valores
+     * @throws SQLException se algum valor não puder ser definido no comando
+     */
     private void preencherParametros(PreparedStatement comando, Livro livro) throws SQLException {
         comando.setString(1, livro.getTitulo());
         comando.setString(2, livro.getAutor());
@@ -176,7 +202,13 @@ public class LivroDAO {
         comando.setString(6, vazioParaNull(livro.getCapaUrl()));
     }
 
-    /** Converte uma linha do banco em um objeto Livro. */
+    /**
+     * Converte a linha atual do resultado em um objeto {@link Livro}.
+     *
+     * @param resultado resultado da consulta, posicionado em uma linha
+     * @return o livro correspondente à linha
+     * @throws SQLException se alguma coluna não puder ser lida
+     */
     private Livro mapear(ResultSet resultado) throws SQLException {
         return new Livro(
                 resultado.getInt("id"),
@@ -188,7 +220,12 @@ public class LivroDAO {
                 resultado.getString("capa_url"));
     }
 
-    /** Guarda NULL no banco em vez de texto vazio. */
+    /**
+     * Guarda NULL no banco em vez de texto vazio.
+     *
+     * @param texto texto a conferir
+     * @return o texto sem espaços nas pontas, ou {@code null} se for nulo ou vazio
+     */
     private String vazioParaNull(String texto) {
         return (texto == null || texto.isBlank()) ? null : texto.trim();
     }
@@ -196,6 +233,9 @@ public class LivroDAO {
     /**
      * Se o usuário digitar % ou _ na busca, eles seriam tratados como curingas do LIKE.
      * Aqui eles viram texto comum (a barra invertida é o caractere de escape padrão do MySQL).
+     *
+     * @param texto texto digitado pelo usuário
+     * @return o texto com {@code \}, {@code %} e {@code _} protegidos por barra invertida
      */
     private String escaparCuringasLike(String texto) {
         return texto.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");

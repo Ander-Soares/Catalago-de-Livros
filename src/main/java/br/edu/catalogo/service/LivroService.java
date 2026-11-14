@@ -24,16 +24,32 @@ public class LivroService {
             "Romance", "Ficção", "Fantasia", "Aventura", "Drama",
             "Terror", "Biografia", "Técnico", "Outro");
 
+    /** Menor ano de publicação aceito. */
     public static final int ANO_MINIMO = 1;
-    public static final int ANO_MAXIMO = 2100;   // igual ao CHECK da tabela no banco
+
+    /** Maior ano de publicação aceito (igual ao CHECK da tabela no banco). */
+    public static final int ANO_MAXIMO = 2100;
+
+    /** Tamanho máximo do título, em caracteres (igual à coluna do banco). */
     public static final int MAX_TITULO = 150;
+
+    /** Tamanho máximo do nome do autor, em caracteres (igual à coluna do banco). */
     public static final int MAX_AUTOR = 100;
+
+    /** Tamanho máximo da sinopse, em caracteres. */
     public static final int MAX_DETALHES = 2000;
+
+    /** Tamanho máximo do endereço da capa, em caracteres (igual à coluna do banco). */
     public static final int MAX_CAPA_URL = 500;
 
+    /** Acesso ao banco de dados. */
     private final LivroDAO dao;
 
-    /** O DAO é recebido pelo construtor, o que facilita trocá-lo em testes. */
+    /**
+     * Cria o serviço. O DAO é recebido pelo construtor, o que facilita trocá-lo em testes.
+     *
+     * @param dao objeto de acesso aos dados dos livros
+     */
     public LivroService(LivroDAO dao) {
         this.dao = dao;
     }
@@ -42,12 +58,25 @@ public class LivroService {
     // Operações usadas pelo Servlet
     // ------------------------------------------------------------------
 
-    /** Lista os livros, com busca (título ou autor) e filtro de gênero opcionais. */
+    /**
+     * Lista os livros, com busca (título ou autor) e filtro de gênero opcionais.
+     *
+     * @param termo  texto a procurar em título e autor (pode ser {@code null})
+     * @param genero gênero exato a filtrar (pode ser {@code null})
+     * @return livros encontrados, em ordem alfabética de título
+     * @throws SQLException se houver problema no banco de dados
+     */
     public List<Livro> listar(String termo, String genero) throws SQLException {
         return dao.buscar(termo, genero);
     }
 
-    /** @return o livro, ou {@code null} se não existir */
+    /**
+     * Busca um livro pelo id.
+     *
+     * @param id identificador do livro
+     * @return o livro, ou {@code null} se não existir
+     * @throws SQLException se houver problema no banco de dados
+     */
     public Livro buscarPorId(int id) throws SQLException {
         return dao.buscarPorId(id);
     }
@@ -55,6 +84,7 @@ public class LivroService {
     /**
      * Valida e grava o livro: insere se ele ainda não tem id, atualiza se já tem.
      *
+     * @param livro livro a gravar (os textos são aparados antes da validação)
      * @throws ValidacaoException se algum dado for inválido (nada é gravado)
      * @throws SQLException       se houver problema no banco de dados
      */
@@ -73,7 +103,13 @@ public class LivroService {
         }
     }
 
-    /** @return {@code true} se o livro existia e foi excluído */
+    /**
+     * Exclui um livro.
+     *
+     * @param id identificador do livro a excluir
+     * @return {@code true} se o livro existia e foi excluído
+     * @throws SQLException se houver problema no banco de dados
+     */
     public boolean excluir(int id) throws SQLException {
         return dao.excluir(id);
     }
@@ -85,6 +121,9 @@ public class LivroService {
     /**
      * Confere todas as regras e devolve a lista de problemas (vazia = tudo certo).
      * Não acessa o banco e não altera o livro.
+     *
+     * @param livro livro a validar
+     * @return mensagens de erro, prontas para exibir ao usuário (lista vazia se o livro é válido)
      */
     public List<String> validar(Livro livro) {
         List<String> erros = new ArrayList<>();
@@ -131,7 +170,11 @@ public class LivroService {
     // Auxiliares
     // ------------------------------------------------------------------
 
-    /** Remove espaços sobrando no começo/fim dos textos. */
+    /**
+     * Remove espaços sobrando no começo e no fim dos textos do livro.
+     *
+     * @param livro livro cujos textos serão aparados (o próprio objeto é alterado)
+     */
     private void normalizar(Livro livro) {
         livro.setTitulo(aparar(livro.getTitulo()));
         livro.setAutor(aparar(livro.getAutor()));
@@ -140,15 +183,32 @@ public class LivroService {
         livro.setCapaUrl(aparar(livro.getCapaUrl()));
     }
 
+    /**
+     * Apara um texto, aceitando {@code null}.
+     *
+     * @param texto texto a aparar
+     * @return o texto sem espaços nas pontas, ou {@code null} se o texto for nulo
+     */
     private String aparar(String texto) {
         return texto == null ? null : texto.trim();
     }
 
+    /**
+     * Informa se um texto está ausente ou só tem espaços.
+     *
+     * @param texto texto a conferir
+     * @return {@code true} se o texto for nulo ou estiver em branco
+     */
     private boolean vazio(String texto) {
         return texto == null || texto.isBlank();
     }
 
-    /** Só aceita http/https com host. Isso também barra esquemas perigosos como javascript:. */
+    /**
+     * Só aceita http/https com host. Isso também barra esquemas perigosos como {@code javascript:}.
+     *
+     * @param url endereço a conferir (já sem espaços nas pontas)
+     * @return {@code true} se for um endereço http ou https válido, dentro do limite de tamanho
+     */
     private boolean urlValida(String url) {
         if (url.length() > MAX_CAPA_URL) {
             return false;

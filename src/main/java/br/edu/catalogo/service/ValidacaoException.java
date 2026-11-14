@@ -11,20 +11,36 @@ import java.util.List;
  */
 public class ValidacaoException extends Exception {
 
+    /** Identificador de versão da classe (exigido para exceções serializáveis). */
     private static final long serialVersionUID = 1L;
 
+    /** Mensagens de erro de validação, prontas para exibir ao usuário. */
     private final transient List<String> erros;
 
+    /**
+     * Cria a exceção com várias mensagens de erro.
+     *
+     * @param erros mensagens de erro de validação (não pode ser {@code null})
+     */
     public ValidacaoException(List<String> erros) {
         super(String.join(" | ", erros));
         this.erros = List.copyOf(erros);
     }
 
+    /**
+     * Cria a exceção com uma única mensagem de erro.
+     *
+     * @param erro mensagem de erro de validação
+     */
     public ValidacaoException(String erro) {
         this(List.of(erro));
     }
 
-    /** Mensagens prontas para exibir ao usuário. */
+    /**
+     * Devolve as mensagens de erro, prontas para exibir ao usuário.
+     *
+     * @return lista imutável de mensagens de erro
+     */
     public List<String> getErros() {
         return erros;
     }
